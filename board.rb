@@ -14,6 +14,22 @@ module Chess
       grid.each{|e| p e}
     end
 
+    #need to think about user input vs xy as parameters    
+    def move_piece(start_pos, end_pos)
+      a,b = pgn_to_xy(start_pos)
+      x,y = pgn_to_xy(end_pos)
+      piece = grid[a][b]
+      grid[a][b] = nil
+      grid[x][y] = piece
+    end
+
+    def pgn_to_xy(pgn)
+      column = {'a' => 0,'b' => 1,'c' => 2,'d' => 3,'e' => 4,'f' => 5,'g' => 6,'h' => 7}
+      y = column[pgn[0]]
+      x = (pgn[1].to_i-8).abs
+      return [x,y]
+    end
+
     def back_rank
       return ["R", "N", "B","Q", "K", "B", "N", "R"]
     end
