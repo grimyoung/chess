@@ -11,7 +11,16 @@ module Chess
 
     #need to make this pretty
     def display_grid
-      grid.each{|e| p e}
+      grid.each do |row|
+        row.each do |square|
+          if square.nil?
+            print " " + "__" + " "
+          else
+            print " " + square + " "
+          end
+        end
+        print "\n"
+      end
     end
 
     #need to think about user input vs xy as parameters    
@@ -19,6 +28,8 @@ module Chess
       a,b = pgn_to_xy(start_pos)
       x,y = pgn_to_xy(end_pos)
       piece = grid[a][b]
+      #check if king is in check
+      #check if valid move
       grid[a][b] = nil
       grid[x][y] = piece
     end
@@ -41,6 +52,9 @@ module Chess
     def color_pieces(color, pieces)
       return pieces.map{|e| color + e}
     end
+
+
+
   end
 end
 
