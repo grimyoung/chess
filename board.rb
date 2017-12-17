@@ -1,6 +1,8 @@
 module Chess
   class Board
     attr_accessor :grid
+
+    #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
       @grid = Array.new(6){Array.new(8)}
       @grid[0] = color_pieces('b', back_rank)
@@ -28,6 +30,7 @@ module Chess
       a,b = pgn_to_xy(start_pos)
       x,y = pgn_to_xy(end_pos)
       piece = grid[a][b]
+      color = piece[0]
       #check if king is in check
       #check if valid move
       grid[a][b] = nil
@@ -53,10 +56,93 @@ module Chess
       return pieces.map{|e| color + e}
     end
 
+    def in_bounds?(pos)
+      x,y = pos
+      if x >=0 && x <=7 && y >=0 && y <=7
+        return true
+      end
+      return false
+    end
+
+    def square_empty?(pos)
+      x,y = pos
+      if grid[x][y].nil?
+        return true
+      end
+      return false
+    end
+
+    def enemy_square?(color,pos)
+      x,y = pos
+      if grid[x][y].nil?
+        return false
+      elsif grid[x][y][0] != color
+        return true
+      end
+      return false
+    end
+
+    def valid_moves?(piece,color,pos)
+      moves = []
+      if piece == "P"
+        moves = pawn_moves(color,pos)
+      end
+    end
 
 
+
+    def pawn_moves(color,pos)
+      x,y = pos
+      moves = []
+      #todo en passant
+      if color == "w"
+        move_one = [x-1,y]
+        move_two = [x-2,y]
+        if square_empty?(move_one)
+          moves.push(move_one)
+          if x == 6 && square_empty?(move_two)
+            moves.push(move_two)
+          end
+        end
+
+        left_cap = [x-1,y-1]
+        right_cap = [x-1,y+1]
+        if in_bounds?(left_cap) && enemy_square?("w",left_cap)
+          moves.push(left_cap)
+        end
+        if in_bounds?(right_cap) && enemy_square?("w",right_cap)
+          moves.push(right_cap)
+        end
+      else
+        move_one = [x+1,y]
+        move_two = [x+2,y]
+        if square_empty?(move_one)
+          moves.push(move_one)
+          if x == 1 && square_empty?(move_two)
+            moves.push(move_two)
+          end
+        end
+
+        left_cap = [x+1,y-1]
+        right_cap = [x+1,y+1]
+        if in_bounds?(left_cap) && enemy_square?("b",left_cap)
+          moves.push(left_cap)
+        end
+        if in_bounds?(right_cap) && enemy_square?("b",right_cap)
+          moves.push(right_cap)
+        end
+      end
+      return moves
+    end
+
+    def knight_moves(color,pos)
+    end
+
+    
   end
 end
 
 test = Chess::Board.new
+test.display_grid
+puts
 test.display_grid
