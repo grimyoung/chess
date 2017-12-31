@@ -95,7 +95,7 @@ module Chess
       when "B"
         moves = bishop_moves(color,pos)
       when "Q"
-
+        moves = queen_moves(color,pos)
       when "K"
 
       else
@@ -212,13 +212,17 @@ module Chess
       return moves
     end
 
-
-
+    def queen_moves(color,pos)
+      rook = rook_moves(color,pos)
+      bishop = bishop_moves(color,pos)
+      moves = rook + bishop
+      return moves
+    end
   end
 end
 
 test = Chess::Board.new
 test.display_grid
 puts
-p test.valid_moves?("B","w", [2,1])
+p test.valid_moves?("Q","w", [2,1])
 #test.display_grid
