@@ -93,7 +93,7 @@ module Chess
       when "R"
         moves = rook_moves(color,pos)
       when "B"
-
+        moves = bishop_moves(color,pos)
       when "Q"
 
       when "K"
@@ -188,12 +188,37 @@ module Chess
       return moves
     end
     
+    def bishop_moves(color,pos)
+      x,y = pos
+      moves = []
+      possible = [[1,1], [1,-1], [-1,1],[-1,-1]]
+      possible.each do |adj|
+        a,b = x + adj[0], y + adj[1]
+        pos = [a,b]
+        blocked = false
+        while(in_bounds?(pos) && !blocked)
+          if square_empty?(pos)
+            moves.push(pos)
+          elsif enemy_square?(color,pos)
+            moves.push(pos)
+            blocked = true
+          else
+            blocked = true
+          end
+          a,b = pos[0] + adj[0], pos[1] + adj[1]
+          pos = [a,b]
+        end
+      end
+      return moves
+    end
+
+
+
   end
 end
 
 test = Chess::Board.new
 test.display_grid
 puts
-p test.in_bounds?([100,0])
-p test.valid_moves?("R","w", [2,1])
+p test.valid_moves?("B","w", [2,1])
 #test.display_grid
