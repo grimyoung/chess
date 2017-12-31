@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid
+    attr_accessor :grid, :white_attack, :black_attack
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -9,6 +9,9 @@ module Chess
       @grid[1] = color_pieces('b', pawns)
       @grid[6] = color_pieces('w', pawns)
       @grid[7] = color_pieces('w', back_rank)
+
+      white_attack = []
+      black_attack = []
     end
 
     #need to make this pretty
@@ -26,11 +29,11 @@ module Chess
     end
 
     #need to think about user input vs xy as parameters    
+    #also en passant
     def move_piece(start_pos, end_pos)
       a,b = pgn_to_xy(start_pos)
       x,y = pgn_to_xy(end_pos)
       piece = grid[a][b]
-      puts piece
       color = piece[0]
       #check if king is in check
       #check if valid move
@@ -45,6 +48,7 @@ module Chess
       return [x,y]
     end
 
+    #part of board set up
     def back_rank
       return ["R", "N", "B","Q", "K", "B", "N", "R"]
     end
@@ -56,6 +60,7 @@ module Chess
     def color_pieces(color, pieces)
       return pieces.map{|e| color + e}
     end
+    #end of board setup
 
     def in_bounds?(pos)
       x,y = pos
@@ -83,6 +88,7 @@ module Chess
       return false
     end
 
+
     def valid_moves?(piece,color,pos)
       moves = []
       case piece
@@ -104,11 +110,9 @@ module Chess
     end
 
 
-    #todo en passant
     def pawn_moves(color,pos)
       x,y = pos
       moves = []
-
       if color == "w"
         move_one = [x-1,y]
         move_two = [x-2,y]
@@ -117,15 +121,6 @@ module Chess
           if x == 6 && square_empty?(move_two)
             moves.push(move_two)
           end
-        end
-
-        left_cap = [x-1,y-1]
-        right_cap = [x-1,y+1]
-        if in_bounds?(left_cap) && enemy_square?("w",left_cap)
-          moves.push(left_cap)
-        end
-        if in_bounds?(right_cap) && enemy_square?("w",right_cap)
-          moves.push(right_cap)
         end
       else
         move_one = [x+1,y]
@@ -136,7 +131,25 @@ module Chess
             moves.push(move_two)
           end
         end
-
+      end
+      attack = pawn_attack(color,pos)
+      moves = moves + attack
+      return moves
+    end
+    #todo en passant
+    def pawn_attack(color,pos)
+      x,y =  pos
+      moves = []
+      if color = "w"
+        left_cap = [x-1,y-1]
+        right_cap = [x-1,y+1]
+        if in_bounds?(left_cap) && enemy_square?("w",left_cap)
+          moves.push(left_cap)
+        end
+        if in_bounds?(right_cap) && enemy_square?("w",right_cap)
+          moves.push(right_cap)
+        end
+      else
         left_cap = [x+1,y-1]
         right_cap = [x+1,y+1]
         if in_bounds?(left_cap) && enemy_square?("b",left_cap)
@@ -163,7 +176,6 @@ module Chess
       return moves
     end
 
-    #todo castling or  castling is a king move?
     def rook_moves(color,pos)
       x,y = pos
       moves = []
@@ -218,11 +230,27 @@ module Chess
       moves = rook + bishop
       return moves
     end
+
+    #todo castling
+    def king_moves(color,pos)
+      x,y = pos
+      moves = []
+      possible = [[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+      possible.each do |adj|
+        a,b = x + adj[0] , y + adj[1]
+        pos = [a,b]
+        if in_bounds?(pos) && (square_empty?(pos) || enemy_square?(color,pos))
+          moves.push(pos)
+        end
+      end
+      return moves
+    end
+
   end
 end
 
 test = Chess::Board.new
 test.display_grid
 puts
-p test.valid_moves?("Q","w", [2,1])
+p test.valid_moves?("P","w", [2,1])
 #test.display_grid
