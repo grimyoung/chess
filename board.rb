@@ -30,6 +30,7 @@ module Chess
       a,b = pgn_to_xy(start_pos)
       x,y = pgn_to_xy(end_pos)
       piece = grid[a][b]
+      puts piece
       color = piece[0]
       #check if king is in check
       #check if valid move
@@ -84,17 +85,30 @@ module Chess
 
     def valid_moves?(piece,color,pos)
       moves = []
-      if piece == "P"
+      case piece
+      when "P"
         moves = pawn_moves(color,pos)
+      when "N"
+        moves = knight_moves(color,pos)
+      when "R"
+
+      when "B"
+
+      when "Q"
+
+      when "K"
+
+      else
+
       end
     end
 
 
-
+    #todo en passant
     def pawn_moves(color,pos)
       x,y = pos
       moves = []
-      #todo en passant
+
       if color == "w"
         move_one = [x-1,y]
         move_two = [x-2,y]
@@ -136,6 +150,17 @@ module Chess
     end
 
     def knight_moves(color,pos)
+      x,y = pos
+      moves = []
+      possible = [[1,2], [1,-2], [-1,2], [-1,-2], [2,1], [2,-1], [-2,1], [-2,-1]]
+      possible.each do |adj|
+        a,b = x + adj[0], y + adj[1]
+        pos = [a,b]
+        if in_bounds?(pos) && (square_empty?(pos) || enemy_square?(color,pos))
+          moves.push(pos)
+        end
+      end
+      return moves
     end
 
     
@@ -145,4 +170,5 @@ end
 test = Chess::Board.new
 test.display_grid
 puts
-test.display_grid
+p test.valid_moves?("N","w", [2,1])
+#test.display_grid
