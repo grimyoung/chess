@@ -88,6 +88,7 @@ module Chess
   class Pawn < Piece
     def initialize(color, pos)
       @piece = color + "P"
+      @pawn_attack = []
       super
     end
 
@@ -113,12 +114,11 @@ module Chess
           end
         end
       end
-      attack = pawn_attack(board_state)
-      @moves = @moves + attack
+      @pawn_attack = pawn_attack(board_state)
+      @moves = @moves + @pawn_attack
       return @moves
     end
 
-    #mark defended
     def pawn_attack(board_state)
       x,y =  pos
       attack = []
