@@ -28,17 +28,16 @@ module Chess
       end
     end
 
-    #need to think about user input vs xy as parameters    
-    #also en passant
-    def move_piece(start_pos, end_pos)
-      a,b = pgn_to_xy(start_pos)
-      x,y = pgn_to_xy(end_pos)
+
+    #user input is pgn, code logic uses xy
+    #valid input is checked by game.rb
+    def move_piece(start_pgn, end_pgn)
+      a,b = pgn_to_xy(start_pgn)
+      x,y = pgn_to_xy(end_pgn)
       piece = grid[a][b]
-      color = piece[0]
-      #check if king is in check
-      #check if valid move
       grid[a][b] = nil
       grid[x][y] = piece
+      piece.pos = [x,y]
     end
 
     def pgn_to_xy(pgn)
@@ -126,6 +125,22 @@ module Chess
       end
     end
 
+    #[white king position, black king position]
+    def king_position(color)
+      king_pos = [nil,nil]
+      grid.each do |row|
+        row.each do |square|
+          if square.piece.is_a?(King)
+            if piece.color = "w"
+              king_pos[0] = piece.pos
+            else
+              king_pos[1] = piece.pos
+            end
+          end
+        end
+      end
+      return king_pos
+    end
 
 
     def valid_moves?(piece,color,pos)
