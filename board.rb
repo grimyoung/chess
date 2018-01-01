@@ -5,10 +5,10 @@ module Chess
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
       @grid = Array.new(6){Array.new(8)}
-      @grid[0] = color_pieces('b', back_rank)
-      @grid[1] = color_pieces('b', pawns)
-      @grid[6] = color_pieces('w', pawns)
-      @grid[7] = color_pieces('w', back_rank)
+      @grid[0] = back_rank('b', [0,0])
+      @grid[1] = pawns('b', [1,0])
+      @grid[6] = pawns('w', [6,0])
+      @grid[7] = back_rank('w', [7,0])
 
       white_attack = []
       black_attack = []
@@ -21,7 +21,7 @@ module Chess
           if square.nil?
             print " " + "__" + " "
           else
-            print " " + square + " "
+            print " " + square.piece + " "
           end
         end
         print "\n"
@@ -49,17 +49,33 @@ module Chess
     end
 
     #part of board set up
-    def back_rank
-      return ["R", "N", "B","Q", "K", "B", "N", "R"]
+    def back_rank(color, pos)
+      rank = [Rook.new(color, pos), 
+        Knight.new(color,pos), 
+        Bishop.new(color,pos),
+        Queen.new(color,pos), 
+        King.new(color,pos),
+        Bishop.new(color,pos),
+        Knight.new(color,pos),
+        Rook.new(color, pos)]
+      col = 0
+      rank.each do |piece|
+        piece.pos = [pos[0],pos[1]+col]
+        col = col + 1
+      end
+      return rank
     end
 
-    def pawns
-      return Array.new(8, "P")
+    def pawns(color,pos)
+      pawn_rank = Array.new(8, Pawn.new(color,pos))
+      col = 0
+      pawn_rank.each do |piece|
+        piece.pos = [pos[0],pos[1]+col]
+        col = col + 1
+      end
+      return pawn_rank
     end
 
-    def color_pieces(color, pieces)
-      return pieces.map{|e| color + e}
-    end
     #end of board setup
 
     def in_bounds?(pos)
@@ -82,11 +98,34 @@ module Chess
       x,y = pos
       if grid[x][y].nil?
         return false
-      elsif grid[x][y][0] != color
+      elsif grid[x][y].color != color
         return true
       end
       return false
     end
+
+    def attacked_squares
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil?
+            if square.color == "w"
+              if square.piece.is_a?(Pawn)
+                white_attack = white_attack + square.pawn_attack(grid)
+              else
+                white_attack = white_attack + square.possible_moves(grid)
+              end
+            else
+                if square.piece.is_a?(Pawn)
+                black_attack = black_attack + square.pawn_attack(grid)
+              else
+                black_attack = black_attack + square.possible_moves(grid)
+              end
+            end
+          end
+        end
+      end
+    end
+
 
 
     def valid_moves?(piece,color,pos)
@@ -140,7 +179,7 @@ module Chess
     def pawn_attack(color,pos)
       x,y =  pos
       moves = []
-      if color = "w"
+      if color == "w"
         left_cap = [x-1,y-1]
         right_cap = [x-1,y+1]
         if in_bounds?(left_cap) && enemy_square?("w",left_cap)
