@@ -8,6 +8,7 @@ module Chess
       board = Board.new
       turn = 0
       current_player = "w"
+      last_captured_or_pawn_moved = 0
     end
 
     def play
