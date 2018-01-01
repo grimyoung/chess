@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid, :white_attack, :black_attack
+    attr_accessor :grid,:white_attack,:black_attack
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -9,8 +9,8 @@ module Chess
       @grid[1] = pawns('b', [1,0])
       @grid[6] = pawns('w', [6,0])
       @grid[7] = back_rank('w', [7,0])
-      white_attack = []
-      black_attack = []
+      @white_attack = []
+      @black_attack = []
     end
 
     #need to make this pretty
@@ -38,6 +38,17 @@ module Chess
       8.times do 
         print col_letter + " " * 3
         col_letter = (col_letter.ord + 1).chr
+      end
+    end
+
+    def inspect
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil?
+            p square
+            print "\n"
+          end
+        end
       end
     end
 
@@ -120,18 +131,18 @@ module Chess
       grid.each do |row|
         row.each do |square|
           if !square.nil?
-            square.move = square.possible_moves(grid)
+            square.moves = square.possible_moves(self)
             if square.color == "w"
               if square.piece.is_a?(Pawn)
-                white_attack = white_attack + square.pawn_attack
+                self.white_attack = self.white_attack + square.pawn_attack
               else
-                white_attack = white_attack + square.moves
+                self.white_attack = self.white_attack + square.moves
               end
             else
-                if square.piece.is_a?(Pawn)
-                black_attack = black_attack + square.pawn_attack
+              if square.piece.is_a?(Pawn)
+                self.black_attack = self.black_attack + square.pawn_attack
               else
-                black_attack = black_attack + square.moves
+                self.black_attack = self.black_attack + square.moves
               end
             end
           end

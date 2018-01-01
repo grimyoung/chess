@@ -39,3 +39,5 @@ end
 
 test = Chess::Board.new
 test.display_grid
+test.attacked_squares
+test.inspect
