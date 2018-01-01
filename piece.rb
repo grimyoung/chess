@@ -3,8 +3,8 @@ module Chess
     attr_accessor :pos, :defended
     attr_reader :piece, :color
     def initialize(color, pos)
-      @color = color
       @pos = pos
+      @color = color
       @defended = false
       @moves = []
     end

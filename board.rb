@@ -9,14 +9,15 @@ module Chess
       @grid[1] = pawns('b', [1,0])
       @grid[6] = pawns('w', [6,0])
       @grid[7] = back_rank('w', [7,0])
-
       white_attack = []
       black_attack = []
     end
 
     #need to make this pretty
     def display_grid
+      row_num = 8
       grid.each do |row|
+       print row_num.to_s + " "
         row.each do |square|
           if square.nil?
             print " " + "__" + " "
@@ -24,7 +25,19 @@ module Chess
             print " " + square.piece + " "
           end
         end
+        row_num = row_num - 1
         print "\n"
+      end
+      print_bottom
+      puts
+    end
+
+    def print_bottom
+      print " " * 3
+      col_letter = "a"
+      8.times do 
+        print col_letter + " " * 3
+        col_letter = (col_letter.ord + 1).chr
       end
     end
 
@@ -66,10 +79,10 @@ module Chess
     end
 
     def pawns(color,pos)
-      pawn_rank = Array.new(8, Pawn.new(color,pos))
+      pawn_rank = []
       col = 0
-      pawn_rank.each do |piece|
-        piece.pos = [pos[0],pos[1]+col]
+      8.times do
+        pawn_rank.push(Pawn.new(color,[pos[0],pos[1]+col]))
         col = col + 1
       end
       return pawn_rank
@@ -154,33 +167,25 @@ module Chess
     end
 
 
-    def valid_moves?(piece,color,pos)
-      moves = []
-      case piece
-      when "P"
-        moves = pawn_moves(color,pos)
-      when "N"
-        moves = knight_moves(color,pos)
-      when "R"
-        moves = rook_moves(color,pos)
-      when "B"
-        moves = bishop_moves(color,pos)
-      when "Q"
-        moves = queen_moves(color,pos)
-      when "K"
+    # def valid_moves?(piece,color,pos)
+    #   moves = []
+    #   case piece
+    #   when "P"
+    #     moves = pawn_moves(color,pos)
+    #   when "N"
+    #     moves = knight_moves(color,pos)
+    #   when "R"
+    #     moves = rook_moves(color,pos)
+    #   when "B"
+    #     moves = bishop_moves(color,pos)
+    #   when "Q"
+    #     moves = queen_moves(color,pos)
+    #   when "K"
 
-      else
+    #   else
 
-      end
-    end
-
-
-
+    #   end
+    # end
   end
 end
 
-test = Chess::Board.new
-test.display_grid
-puts
-p test.valid_moves?("P","w", [2,1])
-#test.display_grid

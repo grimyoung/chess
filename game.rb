@@ -1,11 +1,11 @@
-lib_path = File.expand_path(File.dirname(__FILE__))
-Dir[lib_path + "/**/*.rb"].each {|file| require file}
+require_relative "board.rb"
+require_relative "piece.rb"
 
 module Chess
   class Game
     attr_accessor :board, :turn, :current_player
     def initialize
-      board = Board.new
+      #board = Board.new
       turn = 0
       current_player = "w"
       last_captured_or_pawn_moved = 0
@@ -34,11 +34,8 @@ module Chess
         current_player = "w"
       end
     end
-
   end
 end
 
 test = Chess::Board.new
 test.display_grid
-puts
-#p test.valid_moves?("P","w", [2,1])
