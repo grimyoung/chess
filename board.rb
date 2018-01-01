@@ -107,19 +107,30 @@ module Chess
       grid.each do |row|
         row.each do |square|
           if !square.nil?
+            square.move = square.possible_moves(grid)
             if square.color == "w"
               if square.piece.is_a?(Pawn)
-                white_attack = white_attack + square.pawn_attack(grid)
+                white_attack = white_attack + square.pawn_attack
               else
-                white_attack = white_attack + square.possible_moves(grid)
+                white_attack = white_attack + square.moves
               end
             else
                 if square.piece.is_a?(Pawn)
-                black_attack = black_attack + square.pawn_attack(grid)
+                black_attack = black_attack + square.pawn_attack
               else
-                black_attack = black_attack + square.possible_moves(grid)
+                black_attack = black_attack + square.moves
               end
             end
+          end
+        end
+      end
+    end
+
+    def reset_defended
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil?
+            square.defended = false
           end
         end
       end
