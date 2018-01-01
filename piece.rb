@@ -37,6 +37,7 @@ module Chess
     def initialize(color, pos)
       @piece = color + "R"
       @unit_move = [[1,0], [-1,0], [0,1],[0,-1]]
+      @has_moved = false
       super
     end
   end
@@ -90,7 +91,6 @@ module Chess
       super
     end
 
-
     def possible_moves(board_state)
       @moves = []
       x,y = pos
@@ -125,20 +125,36 @@ module Chess
       if color == "w"
         left_cap = [x-1,y-1]
         right_cap = [x-1,y+1]
-        if board_state.in_bounds?(left_cap) && board_state.enemy_square?("w",left_cap)
-          attack.push(left_cap)
+        if board_state.in_bounds?(left_cap)
+          if board_state.enemy_square?("w",left_cap)
+            attack.push(left_cap)
+          elsif !board_state.square_empty?(left_cap)
+            board_state.grid[left_cap[0]][left_cap[1]].defended = true
+          end
         end
-        if board_state.in_bounds?(right_cap) && board_state.enemy_square?("w",right_cap)
-          attack.push(right_cap)
+        if board_state.in_bounds?(right_cap) 
+          if board_state.enemy_square?("w",right_cap)
+            attack.push(right_cap)
+          elsif !board_state.square_empty?(right_cap)
+            board_state.grid[right_cap[0]][right_cap[1]].defended = true
+          end
         end
       else
         left_cap = [x+1,y-1]
         right_cap = [x+1,y+1]
-        if board_state.in_bounds?(left_cap) && board_state.enemy_square?("b",left_cap)
-          attack.push(left_cap)
+        if board_state.in_bounds?(left_cap) 
+          if board_state.enemy_square?("b",left_cap)
+            attack.push(left_cap)
+          elsif !board_state.square_empty?(left_cap)
+            board_state.grid[left_cap[0]][left_cap[1]].defended = true
+          end
         end
-        if board_state.in_bounds?(right_cap) && board_state.enemy_square?("b",right_cap)
-          attack.push(right_cap)
+        if board_state.in_bounds?(right_cap) 
+          if board_state.enemy_square?("b",right_cap)
+            attack.push(right_cap)
+          elsif !board_state.square_empty?(right_cap)
+            board_state.grid[right_cap[0]][right_cap[1]].defended = true
+          end
         end
       end
       return attack
@@ -149,6 +165,7 @@ module Chess
     def initialize(color, pos)
       @piece = color + "K"
       @unit_move = [[1,1], [1,-1], [-1,1],[-1,-1],[1,0], [-1,0], [0,1],[0,-1]]
+      @has_moved = false
       super
     end
 
