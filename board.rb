@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid,:white_attack,:black_attack, :white_castled, :black_castled
+    attr_accessor :grid,:white_attack,:black_attack,:white_castled,:black_castled,:enpassant, :enpassant_file
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -13,6 +13,8 @@ module Chess
       @black_attack = []
       @white_castled = false
       @black_castled = false
+      @enpassant = false
+      @enpassant_file = nil
     end
 
     #need to make this pretty
@@ -55,17 +57,31 @@ module Chess
     end
 
 
-    #user input is pgn, code logic uses xy
+    #user input is pgn, code logic uses xy (row,col)
     #
     def move_piece(start_pgn, end_pgn)
       a,b = pgn_to_xy(start_pgn)
       x,y = pgn_to_xy(end_pgn)
       piece = grid[a][b]
+      color = piece.color
       grid[a][b] = nil
-      #check for promotion
-
+      set_enpassant(piece,x,a,b)
+      if piece.is_a?(Pawn) && (x == 0 || x == 7)
+        piece = get_promotion(color)
+      end
+      
       grid[x][y] = piece
       piece.pos = [x,y]
+    end
+
+    def set_enpassant(piece,x,a,b)
+      if piece.is_a?(Pawn) && (x-a).abs == 2
+        self.enpassant = true
+        self.enpassant_file = b
+      elsif self.enpassant == true
+        self.enpassant = false
+        self.enpassant_file = nil
+      end
     end
 
     def remove_piece(pgn)
@@ -177,16 +193,47 @@ module Chess
       end
     end
 
+
+    def add_castling(color,king_pos)
+      piece = grid[king_pos[0]][king_pos[1]]
+      if ks_castle_possible?(color)
+        if color == "w"
+          piece.moves.push([7,6])
+        else
+          piece.moves.push([0,6])
+        end
+      end
+      if qs_castle_possible?(color)
+        if color == "w"
+          piece.moves.push([7,2])
+        else
+          piece.moves.push([0,2])
+        end
+      end
+    end
+
+    def update_board
+      reset_defended
+      attacked_squares
+      king_pos = king_position
+      #if castling is possible add castling moves to king move
+      add_castling("w",king_pos[0])
+      add_castling("b",king_pos[1])
+      p grid[king_pos[0][0]][king_pos[0][1]].moves
+      p grid[king_pos[1][0]][king_pos[1][1]].moves
+      #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
+    end
+
     #[white king position, black king position]
-    def king_position(color)
+    def king_position
       king_pos = [nil,nil]
       grid.each do |row|
         row.each do |square|
-          if square.piece.is_a?(King)
-            if piece.color = "w"
-              king_pos[0] = piece.pos
+          if square.is_a?(King)
+            if square.color == "w"
+              king_pos[0] = square.pos
             else
-              king_pos[1] = piece.pos
+              king_pos[1] = square.pos
             end
           end
         end
@@ -245,7 +292,7 @@ module Chess
             if black_back_rank[0].is_a?(Rook) && black_back_rank[0].has_moved == false
               if square_empty?([0,1]) && !square_attacked?([0,1],white_attack) &&
                   square_empty?([0,2]) && !square_attacked?([0,2],white_attack) &&
-                  square_empty?([0,3]) && !square_attacked?([0,3],black_attack)
+                  square_empty?([0,3]) && !square_attacked?([0,3],white_attack)
                 return true
               end
             end
@@ -255,7 +302,30 @@ module Chess
       return false
     end
 
+    def get_promotion(color)
+      puts "Pawn Promotion!"
+      puts "What piece do you wish to promote to?"
+      puts "Q R B N"
+      piece = gets.chomp.upcase
+      while !["Q","R","B","N"].include?(piece)
+        puts "Invalid choice"
+        puts "Q R B N"
+      end
+      return create_piece(piece,color)
+    end
 
+    def create_piece(piece,color)
+      case piece
+      when "Q"
+        return Queen.new(color,nil)
+      when "R"
+        return Rook.new(color,nil)
+      when "B"
+        return Bishop.new(color,nil)
+      when "N"
+        return Knight.new(color,nil)
+      end
+    end
 
     # def valid_moves?(piece,color,pos)
     #   moves = []
