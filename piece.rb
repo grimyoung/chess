@@ -38,6 +38,7 @@ module Chess
     def initialize(color, pos)
       @piece = color + "R"
       @unit_move = [[1,0], [-1,0], [0,1],[0,-1]]
+      @has_moved = false
       super
     end
   end
@@ -165,6 +166,7 @@ module Chess
     def initialize(color, pos)
       @piece = color + "K"
       @unit_move = [[1,1], [1,-1], [-1,1],[-1,-1],[1,0], [-1,0], [0,1],[0,-1]]
+      @has_moved = false
       super
     end
 
