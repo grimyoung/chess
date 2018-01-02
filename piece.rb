@@ -35,6 +35,7 @@ module Chess
   end
 
   class Rook < Piece
+    attr_reader :has_moved
     def initialize(color, pos)
       @piece = color + "R"
       @unit_move = [[1,0], [-1,0], [0,1],[0,-1]]
@@ -163,6 +164,7 @@ module Chess
   end
 
   class King < Piece
+    attr_reader :has_moved
     def initialize(color, pos)
       @piece = color + "K"
       @unit_move = [[1,1], [1,-1], [-1,1],[-1,-1],[1,0], [-1,0], [0,1],[0,-1]]
