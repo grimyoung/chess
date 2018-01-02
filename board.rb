@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid,:white_attack,:black_attack
+    attr_accessor :grid,:white_attack,:black_attack, :white_castled, :black_castled
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -11,6 +11,8 @@ module Chess
       @grid[7] = back_rank('w', [7,0])
       @white_attack = []
       @black_attack = []
+      @white_castled = false
+      @black_castled = false
     end
 
     #need to make this pretty
@@ -54,14 +56,21 @@ module Chess
 
 
     #user input is pgn, code logic uses xy
-    #valid input is checked by game.rb
+    #
     def move_piece(start_pgn, end_pgn)
       a,b = pgn_to_xy(start_pgn)
       x,y = pgn_to_xy(end_pgn)
       piece = grid[a][b]
       grid[a][b] = nil
+      #check for promotion
+
       grid[x][y] = piece
       piece.pos = [x,y]
+    end
+
+    def remove_piece(pgn)
+      x,y = pgn_to_xy(pgn)
+      grid[x][y] = nil
     end
 
     def pgn_to_xy(pgn)
@@ -127,6 +136,14 @@ module Chess
       return false
     end
 
+    def square_attacked?(pos, attacked)
+      if attacked.include?(pos)
+        return true
+      end
+      return false
+    end
+
+
     def attacked_squares
       grid.each do |row|
         row.each do |square|
@@ -176,6 +193,68 @@ module Chess
       end
       return king_pos
     end
+
+    def ks_castle_possible?(color)
+      white_back_rank = grid[7]
+      black_back_rank = grid[0]
+      if color == "w" 
+        if white_castled == false
+          if white_back_rank[4].is_a?(King) && white_back_rank[4].has_moved == false
+            if white_back_rank[7].is_a?(Rook) && white_back_rank[7].has_moved == false
+              if square_empty?([7,5]) && !square_attacked?([7,5],black_attack) &&
+                  square_empty?([7,6]) && !square_attacked?([7,6],black_attack)
+                return true
+              end
+            end
+          end
+        end
+      else
+        if black_castled == false
+          if black_back_rank[4].is_a?(King) && black_back_rank[4].has_moved == false
+            if black_back_rank[7].is_a?(Rook) && black_back_rank[7].has_moved == false
+              if square_empty?([0,5]) && !square_attacked?([0,5],white_attack) &&
+                  square_empty?([0,6]) && !square_attacked?([0,6],white_attack)
+                return true
+              end
+            end
+          end
+        end
+      end
+      return false
+    end
+
+
+    def qs_castle_possible?(color)
+      white_back_rank = grid[7]
+      black_back_rank = grid[0]
+      if color == "w" 
+        if white_castled == false
+          if white_back_rank[4].is_a?(King) && white_back_rank[4].has_moved == false
+            if white_back_rank[0].is_a?(Rook) && white_back_rank[0].has_moved == false
+              if square_empty?([7,1]) && !square_attacked?([7,1],black_attack) &&
+                  square_empty?([7,2]) && !square_attacked?([7,2],black_attack) &&
+                  square_empty?([7,3]) && !square_attacked?([7,3],black_attack)
+                return true
+              end
+            end
+          end
+        end
+      else
+        if black_castled == false
+          if black_back_rank[4].is_a?(King) && black_back_rank[4].has_moved == false
+            if black_back_rank[0].is_a?(Rook) && black_back_rank[0].has_moved == false
+              if square_empty?([0,1]) && !square_attacked?([0,1],white_attack) &&
+                  square_empty?([0,2]) && !square_attacked?([0,2],white_attack) &&
+                  square_empty?([0,3]) && !square_attacked?([0,3],black_attack)
+                return true
+              end
+            end
+          end
+        end
+      end
+      return false
+    end
+
 
 
     # def valid_moves?(piece,color,pos)
