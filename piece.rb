@@ -88,9 +88,10 @@ module Chess
 
 
   class Pawn < Piece
+    attr_accessor :p_attack
     def initialize(color, pos)
       @piece = color + "P"
-      @pawn_attack = []
+      @p_attack = []
       super
     end
 
@@ -116,8 +117,8 @@ module Chess
           end
         end
       end
-      @pawn_attack = pawn_attack(board_state)
-      @moves = @moves + @pawn_attack
+      @p_attack = pawn_attack(board_state)
+      @moves = @moves + @p_attack
       return @moves
     end
 
@@ -194,8 +195,62 @@ module Chess
     end
 
     def remove_attack_squares(attacked_squares)
-      @move = @moves.reject{ |step| attacked_squares.include?(step)}
+      @moves = @moves.reject{ |step| attacked_squares.include?(step)}
       return @moves
+    end
+
+    def restrict_pinned_pieces(board_state)
+      @unit_move.each do |step|
+        a,b = pos[0] + step[0], pos[1] + step[1]
+        enemy_piece = nil
+        friendly_piece = nil
+        path = []
+        if step[0] == 0 || step[1] == 0
+          diagonal = false
+        else
+          diagonal = true
+        end
+        move_step = [a,b]
+        while(board_state.in_bounds?(move_step) && enemy_piece.nil?)
+          if friendly_piece.nil?
+            if board_state.friendly_square?(color,move_step)
+              friendly_piece = board_state.grid[move_step[0]][move_step[1]]
+            end
+          else
+            path.push(move_step)
+            if board_state.friendly_square?(color, move_step)
+              break
+            end
+            if board_state.enemy_square?(color,move_step) && enemy_piece.nil?
+              enemy_piece = board_state.grid[move_step[0]][move_step[1]]
+            end
+          end
+          a,b = move_step[0] + step[0], move_step[1] + step[1]
+          move_step = [a,b]
+        end
+        if !enemy_piece.nil? && !friendly_piece.nil?
+          if diagonal
+            if enemy_piece.is_a?(Queen) || enemy_piece.is_a?(Bishop)
+              if friendly_piece.is_a?(Queen) || friendly_piece.is_a?(Bishop)
+                friendly_piece.moves = path
+              elsif friendly_piece.is_a?(Pawn)
+                friendly_piece.p_attack = friendly_piece.p_attack.select{ |move| path.include?(move)}
+                friendly_piece.moves = friendly_piece.p_attack
+              else
+                friendly_piece.moves = []
+              end
+            end
+          else
+            if enemy_piece.is_a?(Queen) || enemy_piece.is_a?(Rook)
+              if friendly_piece.is_a?(Queen) || friendly_piece.is_a?(Rook)
+                friendly_piece.moves = path
+              else
+                friendly_piece.moves = []
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
