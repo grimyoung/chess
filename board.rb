@@ -236,7 +236,7 @@ module Chess
       add_castling(turn_color,king_piece)
       king_piece.restrict_pinned_pieces(self)
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
-
+      #game over condition
     end
 
     #[white king position, black king position]
