@@ -69,7 +69,7 @@ module Chess
       if piece.is_a?(Pawn) && (x == 0 || x == 7)
         piece = get_promotion(color)
       end
-      
+
       grid[x][y] = piece
       piece.pos = [x,y]
     end
@@ -142,6 +142,14 @@ module Chess
       return false
     end
 
+    def friendly_square?(color, pos)
+      if !enemy_square?(color,pos) && !square_empty?(pos)
+        return true
+      end
+      return false
+    end
+
+    #true if square occupied by opposite color otherwise false
     def enemy_square?(color,pos)
       x,y = pos
       if grid[x][y].nil?
@@ -167,13 +175,13 @@ module Chess
             square.moves = square.possible_moves(self)
             if square.color == "w"
               if square.piece.is_a?(Pawn)
-                self.white_attack = self.white_attack + square.pawn_attack
+                self.white_attack = self.white_attack + square.p_attack
               else
                 self.white_attack = self.white_attack + square.moves
               end
             else
               if square.piece.is_a?(Pawn)
-                self.black_attack = self.black_attack + square.pawn_attack
+                self.black_attack = self.black_attack + square.p_attack
               else
                 self.black_attack = self.black_attack + square.moves
               end
@@ -194,8 +202,9 @@ module Chess
     end
 
 
-    def add_castling(color,king_pos)
-      piece = grid[king_pos[0]][king_pos[1]]
+    def add_castling(color,king_piece)
+      #piece = grid[king_piece[0]][king_piece[1]]
+      piece = king_piece
       if ks_castle_possible?(color)
         if color == "w"
           piece.moves.push([7,6])
@@ -212,38 +221,61 @@ module Chess
       end
     end
 
-    def update_board
+    def update_board(turn_color)
       reset_defended
       attacked_squares
       king_pos = king_position
+      if turn_color == "w"
+        king_piece = grid[king_pos[0][0]][king_pos[0][1]]
+        king_piece.remove_attack_squares(black_attack)
+      else
+        king_piece = grid[king_pos[1][0]][king_pos[1][1]]
+        king_piece.remove_attack_squares(white_attack)
+      end
       #if castling is possible add castling moves to king move
-      add_castling("w",king_pos[0])
-      add_castling("b",king_pos[1])
-      p grid[king_pos[0][0]][king_pos[0][1]].moves
-      p grid[king_pos[1][0]][king_pos[1][1]].moves
+      add_castling(turn_color,king_piece)
+      king_piece.restrict_pinned_pieces(self)
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
+
     end
 
     #[white king position, black king position]
     def king_position
-      king_pos = [nil,nil]
+      king_pieces = [nil,nil]
       grid.each do |row|
         row.each do |square|
           if square.is_a?(King)
             if square.color == "w"
-              king_pos[0] = square.pos
+              king_pieces[0] = square.pos
             else
-              king_pos[1] = square.pos
+              king_pieces[1] = square.pos
             end
           end
         end
       end
-      return king_pos
+      return king_pieces
+    end
+
+    def king_checked?(color)
+      white_king_pos, black_king_pos = king_position
+      if color == "w"
+        if black_attack.include?(white_king_pos)
+          return true
+        end
+      else
+        if white_attack.include?(black_king_pos)
+          return true
+        end
+      end
+      return false
     end
 
     def ks_castle_possible?(color)
       white_back_rank = grid[7]
       black_back_rank = grid[0]
+      if king_checked?(color)
+        return false
+      end
       if color == "w" 
         if white_castled == false
           if white_back_rank[4].is_a?(King) && white_back_rank[4].has_moved == false
@@ -274,6 +306,9 @@ module Chess
     def qs_castle_possible?(color)
       white_back_rank = grid[7]
       black_back_rank = grid[0]
+      if king_checked?(color)
+        return false
+      end
       if color == "w" 
         if white_castled == false
           if white_back_rank[4].is_a?(King) && white_back_rank[4].has_moved == false
