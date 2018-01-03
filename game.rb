@@ -111,9 +111,11 @@ test.display_grid
 # test.remove_piece("g1")
 
 #test.update_board
-test.move_piece("e2", "e4")
-p test.enpassant
-p test.enpassant_file
+test.move_piece("c1", "b5")
+test.move_piece("d7", "d6")
+#test.move_piece("d8", "d7")
+test.update_board("b")
+p test.grid[0][4].moves
 #test.attacked_squares
 # puts test.ks_castle_possible?("w")
 test.display_grid
