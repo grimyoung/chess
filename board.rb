@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid,:white_attack,:black_attack,:white_castled,:black_castled,:enpassant, :enpassant_file
+    attr_accessor :grid,:white_attack,:black_attack,:white_castled,:black_castled,:enpassant, :enpassant_pawn_pos
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -14,7 +14,7 @@ module Chess
       @white_castled = false
       @black_castled = false
       @enpassant = false
-      @enpassant_file = nil
+      @enpassant_pawn_pos = nil
     end
 
     #need to make this pretty
@@ -65,7 +65,7 @@ module Chess
       piece = grid[a][b]
       color = piece.color
       grid[a][b] = nil
-      set_enpassant(piece,x,a,b)
+      set_enpassant(piece,x,y,a)
       if piece.is_a?(Pawn) && (x == 0 || x == 7)
         piece = get_promotion(color)
       end
@@ -74,13 +74,13 @@ module Chess
       piece.pos = [x,y]
     end
 
-    def set_enpassant(piece,x,a,b)
+    def set_enpassant(piece,x,y,a)
       if piece.is_a?(Pawn) && (x-a).abs == 2
         self.enpassant = true
-        self.enpassant_file = b
+        self.enpassant_pawn_pos = [x,y]
       elsif self.enpassant == true
         self.enpassant = false
-        self.enpassant_file = nil
+        self.enpassant_pawn_pos = nil
       end
     end
 
@@ -221,6 +221,31 @@ module Chess
       end
     end
 
+    def add_enpassant(color,enpassant_pos)
+      if enpassant == true
+        a,b = enpassant_pos
+        l_pos = [a,b-1]
+        r_pos = [a,b+1]
+        if color == "w"
+          cap = [a-1,b]
+          if in_bounds?(l_pos) && grid[l_pos[0]][l_pos[1]].is_a?(Pawn)
+            grid[l_pos[0]][l_pos[1]].moves.push(cap)
+          end
+          if in_bounds?(r_pos) && grid[r_pos[0]][r_pos[1]].is_a?(Pawn)
+            grid[r_pos[0]][r_pos[1]].moves.push(cap)
+          end
+        else
+          cap = [a+1, b]
+          if in_bounds?(l_pos) && grid[l_pos[0]][l_pos[1]].is_a?(Pawn)
+            grid[l_pos[0]][l_pos[1]].moves.push(cap)
+          end
+          if in_bounds?(r_pos) && grid[r_pos[0]][r_pos[1]].is_a?(Pawn)
+            grid[r_pos[0]][r_pos[1]].moves.push(cap)
+          end
+        end
+      end
+    end
+
     def update_board(turn_color)
       reset_defended
       attacked_squares
@@ -236,6 +261,7 @@ module Chess
       add_castling(turn_color,king_piece)
       king_piece.restrict_pinned_pieces(self)
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
+      add_enpassant(turn_color,enpassant_pawn_pos)
       #game over condition
     end
 
