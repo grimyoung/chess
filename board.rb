@@ -318,8 +318,11 @@ module Chess
         return false
       elsif piece.is_a?(Pawn) || piece.is_a?(Knight)
         return false
+      elsif piece.path_to_king.length > 1
+        return true
       end
-
+      #just in case..
+      return false
     end
 
     def ks_castle_possible?(color)
