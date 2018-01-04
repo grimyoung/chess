@@ -1,25 +1,32 @@
 module Chess
   class Piece
-    attr_accessor :pos, :defended, :moves
+    attr_accessor :pos, :defended, :moves, :path_to_king
     attr_reader :piece, :color
     def initialize(color, pos)
       @pos = pos
       @color = color
       @defended = false
       @moves = []
+      @path_to_king = []
     end
 
     def possible_moves(board_state)
       moves = []
+      path_to_king = []
       @unit_move.each do |step|
         a,b = pos[0] + step[0], pos[1] + step[1]
         move_step = [a,b]
+        path = []
         blocked = false
+        king_found = false
         while(board_state.in_bounds?(move_step) && !blocked)
           if board_state.square_empty?(move_step)
-            moves.push(move_step)
+            path.push(move_step)
           elsif board_state.enemy_square?(color,move_step)
-            moves.push(move_step)
+            if board_state.is_a?(King) && board_state.color != self.color
+              king_found = true
+            end
+            path.push(move_step)
             blocked = true
           else
             board_state.grid[move_step[0]][move_step[1]].defended = true
@@ -28,10 +35,14 @@ module Chess
           a,b = move_step[0] + step[0], move_step[1] + step[1]
           move_step = [a,b]
         end
+        #issues this does not include attacking piece's position and includes the king's position
+        if king_found
+          path_to_king.push(*path)
+        end
+        moves.push(*path)
       end
       return moves
     end
-
   end
 
   class Rook < Piece
