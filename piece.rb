@@ -117,8 +117,8 @@ module Chess
           end
         end
       end
-      @p_attack = pawn_attack(board_state)
-      @moves = @moves + @p_attack
+      attack = pawn_attack(board_state)
+      @moves = @moves + attack
       return @moves
     end
 
@@ -134,6 +134,7 @@ module Chess
           elsif !board_state.square_empty?(left_cap)
             board_state.grid[left_cap[0]][left_cap[1]].defended = true
           end
+          @p_attack.push(left_cap)
         end
         if board_state.in_bounds?(right_cap) 
           if board_state.enemy_square?("w",right_cap)
@@ -141,6 +142,7 @@ module Chess
           elsif !board_state.square_empty?(right_cap)
             board_state.grid[right_cap[0]][right_cap[1]].defended = true
           end
+          @p_attack.push(right_cap)
         end
       else
         left_cap = [x+1,y-1]
@@ -151,6 +153,7 @@ module Chess
           elsif !board_state.square_empty?(left_cap)
             board_state.grid[left_cap[0]][left_cap[1]].defended = true
           end
+          @p_attack.push(left_cap)
         end
         if board_state.in_bounds?(right_cap) 
           if board_state.enemy_square?("b",right_cap)
@@ -158,6 +161,7 @@ module Chess
           elsif !board_state.square_empty?(right_cap)
             board_state.grid[right_cap[0]][right_cap[1]].defended = true
           end
+          @p_attack.push(right_cap)
         end
       end
       return attack
