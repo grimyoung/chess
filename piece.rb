@@ -36,9 +36,12 @@ module Chess
           a,b = move_step[0] + step[0], move_step[1] + step[1]
           move_step = [a,b]
         end
-        #issues: this does not include attacking piece's position and includes the king's position
         if king_found
           @path_to_king.push(*path)
+          #removes king position
+          @path_to_king = @path_to_king[0...-1]
+          #adds the piece's position
+          @path_to_king.unshift(self.pos)
         end
         moves.push(*path)
       end
