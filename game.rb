@@ -111,11 +111,17 @@ test.display_grid
 # test.remove_piece("g1")
 
 #test.update_board
-test.move_piece("c1", "b5")
-test.move_piece("d7", "d6")
+test.move_piece("d2", "d5")
+test.move_piece("f2", "f5")
+test.move_piece("e7", "e5")
 #test.move_piece("d8", "d7")
-test.update_board("b")
-p test.grid[0][4].moves
+test.update_board("w")
+p test.grid[3][3].moves
+p test.grid[3][5].moves
+test.move_piece("c1","c2")
+test.update_board("w")
+p test.grid[3][3].moves
+p test.grid[3][5].moves
 #test.attacked_squares
 # puts test.ks_castle_possible?("w")
 test.display_grid
