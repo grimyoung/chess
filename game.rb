@@ -113,9 +113,10 @@ test.display_grid
 #test.update_board
 test.move_piece("d7", "d5")
 test.move_piece("f1", "b5")
+test.move_piece("b5", "d7")
 #test.move_piece("d8", "d7")
 test.update_board("w")
-p test.grid[3][1].path_to_king
+p test.grid[1][3].path_to_king
 #test.attacked_squares
 # puts test.ks_castle_possible?("w")
 test.display_grid
