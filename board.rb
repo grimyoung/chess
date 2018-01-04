@@ -297,6 +297,19 @@ module Chess
       return false
     end
 
+    def find_checker(color)
+      checker = []
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil? && square.color != color
+            checker.push(square)
+          end
+        end
+      end
+      return checker
+    end
+
+
     def ks_castle_possible?(color)
       white_back_rank = grid[7]
       black_back_rank = grid[0]
