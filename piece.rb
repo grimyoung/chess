@@ -23,7 +23,8 @@ module Chess
           if board_state.square_empty?(move_step)
             path.push(move_step)
           elsif board_state.enemy_square?(color,move_step)
-            if board_state.is_a?(King) && board_state.color != self.color
+            piece = board_state.grid[move_step[0]][move_step[1]]
+            if piece.is_a?(King) && piece.color != self.color
               king_found = true
             end
             path.push(move_step)
@@ -35,9 +36,9 @@ module Chess
           a,b = move_step[0] + step[0], move_step[1] + step[1]
           move_step = [a,b]
         end
-        #issues this does not include attacking piece's position and includes the king's position
+        #issues: this does not include attacking piece's position and includes the king's position
         if king_found
-          path_to_king.push(*path)
+          @path_to_king.push(*path)
         end
         moves.push(*path)
       end
