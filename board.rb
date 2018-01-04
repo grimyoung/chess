@@ -262,6 +262,7 @@ module Chess
       king_piece.restrict_pinned_pieces(self)
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
       add_enpassant(turn_color,enpassant_pawn_pos)
+      #restrict moves for when king is in check
       #game over condition
     end
 
