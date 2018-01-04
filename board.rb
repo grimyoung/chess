@@ -297,18 +297,30 @@ module Chess
       return false
     end
 
-    def find_checker(color)
+    def find_checker(color, king_pos)
       checker = []
       grid.each do |row|
         row.each do |square|
           if !square.nil? && square.color != color
-            checker.push(square)
+            if square.moves.include?(king_pos)
+              checker.push(square)
+            end
           end
         end
       end
       return checker
     end
 
+#?
+    def block_check?(checker)
+      piece = checker[0]
+      if checker.lenth > 2
+        return false
+      elsif piece.is_a?(Pawn) || piece.is_a?(Knight)
+        return false
+      end
+
+    end
 
     def ks_castle_possible?(color)
       white_back_rank = grid[7]
