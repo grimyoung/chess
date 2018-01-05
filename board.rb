@@ -1,6 +1,6 @@
 module Chess
   class Board
-    attr_accessor :grid,:white_attack,:black_attack,:white_castled,:black_castled,:enpassant, :enpassant_pawn_pos
+    attr_accessor :grid,:white_attack,:black_attack,:white_castled,:black_castled,:enpassant, :enpassant_pawn_pos, :legal_moves
 
     #top left is (0,0) bottom right is (7,7), (row,column)
     def initialize
@@ -15,6 +15,7 @@ module Chess
       @black_castled = false
       @enpassant = false
       @enpassant_pawn_pos = nil
+      @legal_moves = []
     end
 
     #need to make this pretty
@@ -263,6 +264,14 @@ module Chess
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
       add_enpassant(turn_color,enpassant_pawn_pos)
       #restrict moves for when king is in check
+      if king_checked?(turn_color)
+        checker = find_checker(turn_color,king_pos)
+        if block_check?(checker)
+
+        else
+
+        end
+      end
       #game over condition
     end
 
@@ -323,6 +332,35 @@ module Chess
       end
       #just in case..
       return false
+    end
+    
+
+    def game_over?(turn_color)
+      if legal_moves.length == 0
+        if king_checked?(turn_color)
+          checkmate
+        else
+          stalemate(turn_color)
+        end
+      end
+    end
+
+    def stalemate(turn_color)
+      if turn_color == "w"
+        color = "white"
+      else
+        color = "black"
+      end
+      puts "Stalemate! " + color + " has no legal moves"
+    end
+
+    def checkmate(turn_color)
+      if turn_color == "w"
+        color = "white"
+      else
+        color = "black"
+      end
+      puts "Checkmate! " + color + " has lost by checkmate!"
     end
 
     def ks_castle_possible?(color)
