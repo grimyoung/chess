@@ -333,7 +333,26 @@ module Chess
       #just in case..
       return false
     end
-    
+
+    def get_legal_moves(color)
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil? && square.color == color
+            @legal_moves.push(*square.moves)
+          end
+        end
+      end
+    end
+
+    def restrict_moves(color, move_array)
+      grid.each do |row|
+        row.each do |square|
+          if !square.nil? && square.color == color
+            square.moves = square.moves.select{|move| move_array.include?(move)}
+          end
+        end
+      end
+    end
 
     def game_over?(turn_color)
       if legal_moves.length == 0
