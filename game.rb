@@ -87,7 +87,7 @@ module Chess
       return false
     end
 
-    def valid_loop()
+    def valid_loop
       user_move = gets.chomp
       while ! valid_input(user_move)
         board.display_grid
