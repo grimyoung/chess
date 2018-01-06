@@ -65,6 +65,11 @@ module Chess
       x,y = pgn_to_xy(end_pgn)
       piece = grid[a][b]
       color = piece.color
+
+      if piece.is_a?(King) && (ks_castle_possible?(color) || qs_castle_possible?(color))
+        castling(color,x,y)
+      end
+
       grid[a][b] = nil
       set_enpassant(piece,x,y,a)
       if piece.is_a?(Pawn)  && (x == 0 || x == 7)
@@ -73,9 +78,7 @@ module Chess
       if piece.is_a?(Pawn) && enpassant
         enpassant_move(color,x,y)
       end
-      if piece.is_a?(King) && (ks_castle_possible?(color) || qs_castle_possible?(color))
-        castling(color,x,y)
-      end
+
 
       grid[x][y] = piece
       piece.pos = [x,y]
@@ -111,15 +114,19 @@ module Chess
     def castling(color,x,y)
       if color == "w"
         if x == 7 && y == 6
+          puts "trigger1"
           self.move_piece("h1", "f1")
         elsif x == 7 && y == 2
+          puts "trigger2"
           self.move_piece("a1","d1")
         end
         @white_castled = true
       else
         if x == 0 && y == 6
+          puts "trigger3"
           self.move_piece("h8", "f8")
         elsif x == 0 && y == 2
+          puts "trigger4"
           self.move_piece("a8", "d8")
         end
         @black_castled = true
@@ -363,7 +370,7 @@ module Chess
 
     def block_check?(checker)
       piece = checker[0]
-      if checker.lenth > 2
+      if checker.length > 2
         return false
       elsif piece.is_a?(Pawn) || piece.is_a?(Knight)
         return false
