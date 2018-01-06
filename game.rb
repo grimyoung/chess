@@ -68,7 +68,7 @@ module Chess
 
     def intro
       puts "Welcome to chess"
-      puts "Moves are in the form letternumber e.g. a1"
+      puts "Moves are in the form letternumber e.g. a1a2"
     end
 
     def player_color(text)
@@ -79,7 +79,9 @@ module Chess
     end
 
     def valid_input(string)
-      if string.length == 2 && string[0] =~ /[[:alpha:]]/ && string[1] =~ /[[:digit:]]/
+      letters = string[0] + string[2]
+      nums = string[1] + string[3]
+      if string.length == 4 && letters =~ /[[:alpha:]]/ && nums =~ /[[:digit:]]/
         return true
       end
       return false
@@ -99,9 +101,8 @@ module Chess
     end
 
     def get_user_input
-      start_square = valid_loop("Starting square:")
-      end_square = valid_loop("Ending square:")
-      return [start_square,end_square]
+      move = valid_loop("Starting square:")
+      return [move[0..1],move[2..3]]
     end
 
   end
