@@ -67,7 +67,7 @@ module Chess
       color = piece.color
       grid[a][b] = nil
       set_enpassant(piece,x,y,a)
-      if piece.is_a?(Pawn) && (x == 0 || x == 7)
+      if piece.is_a?(Pawn)  && (x == 0 || x == 7)
         piece = get_promotion(color)
       end
       if piece.is_a?(Pawn) && enpassant
@@ -79,7 +79,7 @@ module Chess
 
       grid[x][y] = piece
       piece.pos = [x,y]
-      if (piece.is_a(King) || piece.is_a(Rook)) && piece.has_moved == false
+      if (piece.is_a?(King) || piece.is_a?(Rook)) && piece.has_moved == false
         piece.has_moved = true
       end
     end
@@ -301,6 +301,7 @@ module Chess
       end
       #if castling is possible add castling moves to king move
       add_castling(turn_color,king_piece)
+
       king_piece.restrict_pinned_pieces(self)
       #if enpassant is possible add it to pawns on right and left file on the 4th or 5th rank
       add_enpassant(turn_color,enpassant_pawn_pos)
@@ -394,7 +395,7 @@ module Chess
     end
 
     def game_over?(turn_color)
-      get_legal_moves
+      get_legal_moves(turn_color)
       if legal_moves.length == 0
         if king_checked?(turn_color)
           checkmate(turn_color)
@@ -520,6 +521,10 @@ module Chess
     def legal_move?(color, start_pgn,end_pgn)
       a,b = pgn_to_xy(start_pgn)
       x,y = pgn_to_xy(end_pgn)
+      if square_empty?([a,b])
+        return false
+      end
+      #grid[x][y]
       if grid[a][b].color == color && grid[a][b].moves.include?([x,y])
         return true
       end
