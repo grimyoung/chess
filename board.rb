@@ -70,7 +70,9 @@ module Chess
       if piece.is_a?(Pawn) && (x == 0 || x == 7)
         piece = get_promotion(color)
       end
-
+      if piece.is_a?(Pawn) && enpassant
+        enpassant_move(color,x,y)
+      end
       if piece.is_a?(King) && (ks_castle_possible?(color) || qs_castle_possible?(color))
         castling(color,x,y)
       end
@@ -89,6 +91,19 @@ module Chess
       elsif self.enpassant == true
         self.enpassant = false
         self.enpassant_pawn_pos = nil
+      end
+    end
+
+    def enpassant_move(color,x,y)
+      n, m = enpassant_pawn_pos
+      if color == "w"
+        if x == (n-1) && y == m
+          grid[n][m] = nil
+        end
+      else
+        if x == (n+1) && y == m
+          grid[n][m] = nil
+        end
       end
     end
 
