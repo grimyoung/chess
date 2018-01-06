@@ -71,12 +71,13 @@ module Chess
       end
 
       grid[a][b] = nil
+      if piece.is_a?(Pawn) && enpassant
+        enpassant_move(color,x,y)
+      end
+      
       set_enpassant(piece,x,y,a)
       if piece.is_a?(Pawn)  && (x == 0 || x == 7)
         piece = get_promotion(color)
-      end
-      if piece.is_a?(Pawn) && enpassant
-        enpassant_move(color,x,y)
       end
 
 
@@ -99,6 +100,7 @@ module Chess
 
     def enpassant_move(color,x,y)
       n, m = enpassant_pawn_pos
+      puts n,m
       if color == "w"
         if x == (n-1) && y == m
           grid[n][m] = nil
