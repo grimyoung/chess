@@ -267,9 +267,9 @@ module Chess
       if king_checked?(turn_color)
         checker = find_checker(turn_color,king_pos)
         if block_check?(checker)
-
+          restrict_moves(turn_color, checker.path_to_king)
         else
-
+          restrict_moves(turn_color)
         end
       end
       #game over condition
@@ -344,10 +344,10 @@ module Chess
       end
     end
 
-    def restrict_moves(color, move_array)
+    def restrict_moves(color, move_array = [])
       grid.each do |row|
         row.each do |square|
-          if !square.nil? && square.color == color
+          if !square.nil? && square.color == color && !square.is_a?(King)
             square.moves = square.moves.select{|move| move_array.include?(move)}
           end
         end
@@ -355,6 +355,7 @@ module Chess
     end
 
     def game_over?(turn_color)
+      get_legal_moves
       if legal_moves.length == 0
         if king_checked?(turn_color)
           checkmate
