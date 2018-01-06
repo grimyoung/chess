@@ -32,12 +32,13 @@ module Chess
         end
         board.move_piece(move[0],move[1])
         change_player
+        
       end
     end
 
     def player_check(board_state)
       if board_state.king_checked?(current_player)
-        puts player_color(current_player) + "is in check!"
+        puts player_color(current_player) + " is in check!"
       end
     end
 
@@ -107,3 +108,13 @@ module Chess
 end
 
 test = Chess::Game.new.play
+# test = Chess::Board.new
+# test.move_piece("e2","e4")
+# test.move_piece("e7","e5")
+# test.move_piece("f1","c4")
+# test.move_piece("b8","c6")
+# test.move_piece("d1","h5")
+# test.move_piece("g8","f6")
+# test.move_piece("h5","f7")
+# test.display_grid
+# test.update_board("b")
