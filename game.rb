@@ -20,7 +20,7 @@ module Chess
         board.display_grid
         puts
         player_check(board)
-        puts player_color(current_player) + " please make a move"
+        puts player_color(current_player) + " please make a move:"
         move = get_user_input 
         #check if input is a legal move
         while !board.legal_move?(current_player, move[0],move[1])
@@ -87,21 +87,19 @@ module Chess
       return false
     end
 
-    def valid_loop(string)
-      puts string
+    def valid_loop()
       user_move = gets.chomp
       while ! valid_input(user_move)
         board.display_grid
         puts "That was not a valid input."
         puts "Please try again:"
-        puts string
         user_move = gets.chomp
       end
       return user_move
     end
 
     def get_user_input
-      move = valid_loop("Starting square:")
+      move = valid_loop
       return [move[0..1],move[2..3]]
     end
 
