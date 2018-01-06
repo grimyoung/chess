@@ -71,8 +71,15 @@ module Chess
         piece = get_promotion(color)
       end
 
+      if piece.is_a?(King) && (ks_castle_possible?(color) || qs_castle_possible?(color))
+        castling(color,x,y)
+      end
+
       grid[x][y] = piece
       piece.pos = [x,y]
+      if (piece.is_a(King) || piece.is_a(Rook)) && piece.has_moved == false
+        piece.has_moved = true
+      end
     end
 
     def set_enpassant(piece,x,y,a)
@@ -82,6 +89,25 @@ module Chess
       elsif self.enpassant == true
         self.enpassant = false
         self.enpassant_pawn_pos = nil
+      end
+    end
+
+    #works since the rook is moved before the king
+    def castling(color,x,y)
+      if color == "w"
+        if x == 7 && y == 6
+          self.move_piece("h1", "f1")
+        elsif x == 7 && y == 2
+          self.move_piece("a1","d1")
+        end
+        @white_castled = true
+      else
+        if x == 0 && y == 6
+          self.move_piece("h8", "f8")
+        elsif x == 0 && y == 2
+          self.move_piece("a8", "d8")
+        end
+        @black_castled = true
       end
     end
 
@@ -320,7 +346,6 @@ module Chess
       return checker
     end
 
-#?
     def block_check?(checker)
       piece = checker[0]
       if checker.lenth > 2
