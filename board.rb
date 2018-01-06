@@ -500,25 +500,14 @@ module Chess
       end
     end
 
-    # def valid_moves?(piece,color,pos)
-    #   moves = []
-    #   case piece
-    #   when "P"
-    #     moves = pawn_moves(color,pos)
-    #   when "N"
-    #     moves = knight_moves(color,pos)
-    #   when "R"
-    #     moves = rook_moves(color,pos)
-    #   when "B"
-    #     moves = bishop_moves(color,pos)
-    #   when "Q"
-    #     moves = queen_moves(color,pos)
-    #   when "K"
-
-    #   else
-
-    #   end
-    # end
+    def valid_move?(start_pgn,end_pgn)
+      a,b = pgn_to_xy(start_pgn)
+      x,y = pgn_to_xy(end_pgn)
+      if grid[a][b].moves.include?([x,y])
+        return true
+      end
+      return false
+    end
   end
 end
 
