@@ -399,10 +399,13 @@ module Chess
       if legal_moves.length == 0
         if king_checked?(turn_color)
           checkmate
+          return true
         else
           stalemate(turn_color)
+          return true
         end
       end
+      return false
     end
 
     def stalemate(turn_color)
@@ -515,7 +518,7 @@ module Chess
       end
     end
 
-    def valid_move?(start_pgn,end_pgn)
+    def legal_move?(start_pgn,end_pgn)
       a,b = pgn_to_xy(start_pgn)
       x,y = pgn_to_xy(end_pgn)
       if grid[a][b].moves.include?([x,y])
