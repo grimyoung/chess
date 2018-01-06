@@ -315,7 +315,7 @@ module Chess
       add_enpassant(turn_color,enpassant_pawn_pos)
       #restrict moves for when king is in check
       if king_checked?(turn_color)
-        checker = find_checker(turn_color,king_pos)
+        checker = find_checker(turn_color, king_piece.pos)
         if block_check?(checker)
           restrict_moves(turn_color, checker.path_to_king)
         else
@@ -371,6 +371,7 @@ module Chess
 
     def block_check?(checker)
       piece = checker[0]
+      puts piece
       if checker.length > 2
         return false
       elsif piece.is_a?(Pawn) || piece.is_a?(Knight)
