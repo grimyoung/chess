@@ -313,7 +313,6 @@ module Chess
           restrict_moves(turn_color)
         end
       end
-      #game over condition
     end
 
     #[white king position, black king position]
@@ -398,7 +397,7 @@ module Chess
       get_legal_moves
       if legal_moves.length == 0
         if king_checked?(turn_color)
-          checkmate
+          checkmate(turn_color)
           return true
         else
           stalemate(turn_color)
@@ -518,10 +517,10 @@ module Chess
       end
     end
 
-    def legal_move?(start_pgn,end_pgn)
+    def legal_move?(color, start_pgn,end_pgn)
       a,b = pgn_to_xy(start_pgn)
       x,y = pgn_to_xy(end_pgn)
-      if grid[a][b].moves.include?([x,y])
+      if grid[a][b].color == color && grid[a][b].moves.include?([x,y])
         return true
       end
       return false
