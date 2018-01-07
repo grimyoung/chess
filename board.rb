@@ -298,6 +298,7 @@ module Chess
 
     def update_board(turn_color)
       reset_defended
+      reset_legal_moves
       attacked_squares
       king_pos = king_position
       if turn_color == "w"
@@ -322,6 +323,7 @@ module Chess
           restrict_moves(turn_color)
         end
       end
+      get_legal_moves(turn_color)
     end
 
     #[white king position, black king position]
@@ -383,6 +385,10 @@ module Chess
       return false
     end
 
+    def reset_legal_moves
+      @legal_moves = []
+    end
+
     def get_legal_moves(color)
       grid.each do |row|
         row.each do |square|
@@ -403,15 +409,12 @@ module Chess
       end
     end
 
-    def game_over?(turn_color)
-      get_legal_moves(turn_color)
-      if legal_moves.length == 0
+    def game_over(turn_color)
+      if @legal_moves.length == 0
         if king_checked?(turn_color)
-          checkmate(turn_color)
-          return true
+          return :checkmate
         else
-          stalemate(turn_color)
-          return true
+          return :stalemate
         end
       end
       return false

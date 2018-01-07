@@ -15,11 +15,16 @@ module Chess
     def play
       intro
       board.update_board(current_player)
-      while !board.game_over?(current_player)
+      while true
         board.update_board(current_player)
         board.display_grid
-        puts
         player_check(board)
+        if board.game_over(current_player)
+          game_over_message(current_player)
+          puts
+          return
+        end
+
         puts player_color(current_player) + " please make a move:"
         move = get_user_input 
         #check if input is a legal move
@@ -42,22 +47,23 @@ module Chess
       end
     end
 
-    #defined in board.rb
-    def stalemate?(board_state)
-      if turn - last_captured_or_pawn_moved >= 50
-        puts "Game over - Stalemate: Over fifty moves without piece capture or pawn moved"
-        return true
+    def game_over_message(turn_color)
+      color = player_color(turn_color)
+      if board.game_over(turn_color) == :checkmate
+        puts "Checkmate! " + color + " has lost by checkmate!"
+      elsif board.game_over(turn_color) == :stalemate
+        puts "Stalemate! " + color + " has no legal moves"
       end
-      if draw_proposal == true
-        puts "Game over- Stalemate: Drawn by agreement"
-        return true
-      end
-      #no legal moves but not in check
-      #Threefold Repetition
-      #Insufficient Mating Material
-      return false
     end
 
+    #defined in board.rb
+    def stalemate?(board_state)
+      # 50 moves since last capture or pawn moved
+      # drawn by agreement
+      # no legal moves but not in check
+      # Threefold Repetition
+      # Insufficient Mating Material
+    end
 
     def change_player
       if self.current_player == "w"
